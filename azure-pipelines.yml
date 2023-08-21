@@ -1,0 +1,37 @@
+trigger:
+  branches:
+    include:
+      - 'main'  
+
+pool:
+  name: 'Self Hosted Linux Build Agents'
+  demands:
+    - agent.name -equals ny5karbonutl01.conedison.net
+
+stages:
+- stage: DeployGrafana
+  jobs:
+  - job: Deploy
+    variables:
+      KUBECONFIG: $(kubeconfig.secureFilePath)
+    steps:
+    - task: DownloadSecureFile@1
+      name: kubeconfig
+      inputs:
+        secureFile: 'ny5-dce-nonprod-bhattij-c01-kubectl.cfg'
+      displayName: 'Download Kubeconfig File'
+
+    - script: kubectl config use-context ny5-dce-nonprod-bhattij-c01-context
+      displayName: 'Set Kubectl Context'
+
+    - checkout: self  #checks out the code 
+    
+    - script: |
+        wget -q https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+        chmod +x get-helm-3
+        ./get-helm-3
+      displayName: 'Install Helm'
+
+    - script: |
+        helm upgrade --install grafana ./charts/grafana --namespace grafana -f ./charts/grafana/values.yaml
+      displayName: 'Deploy Grafana with Helm'
