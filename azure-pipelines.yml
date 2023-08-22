@@ -3,10 +3,10 @@ trigger:
     include:
       - 'main'  
 
-# pool:
-#   name: 'Self Hosted Linux Build Agents'
-#   demands:
-#     - agent.name -equals ny5karbonutl01.conedison.net
+pool:
+  name: 'Self Hosted Linux Build Agents'
+  demands:
+    - agent.name -equals ny5karbonutl01.conedison.net
 
 stages:
 - stage: DeployGrafana
