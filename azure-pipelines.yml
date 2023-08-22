@@ -25,12 +25,6 @@ stages:
       displayName: 'Set Kubectl Context'
 
     - checkout: self  #checks out the code 
-    
-    - script: |
-        wget -q https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
-        chmod +x get-helm-3
-        ./get-helm-3
-      displayName: 'Install Helm'
 
     - script: |
         helm upgrade --install grafana ./charts/grafana --namespace grafana -f ./charts/grafana/values.yaml
