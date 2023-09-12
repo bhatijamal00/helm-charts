@@ -21,8 +21,24 @@ stages:
         secureFile: 'ny5-dce-nonprod-bhattij-c01-kubectl.cfg'
       displayName: 'Download Kubeconfig File'
 
+    - task: DownloadSecureFile@1
+      name: tlsKey
+      inputs:
+        secureFile: 'private.key'
+      displayName: 'Download TLS Key'
+
+    - task: DownloadSecureFile@1
+      name: tlsCert
+      inputs:
+        secureFile: 'certificate.cer'
+      displayName: 'Download TLS Certificate'
+
     - script: kubectl config use-context ny5-dce-nonprod-bhattij-c01-context
       displayName: 'Set Kubectl Context'
+
+    - script: |
+        kubectl create secret tls grafana-tls --key $(tlsKey.secureFilePath) --cert $(tlsCert.secureFilePath) --namespace grafana --dry-run=client -o yaml | kubectl apply -f -
+      displayName: 'Create TLS Secret for Grafana'
 
     - checkout: self  #checks out the code 
 
